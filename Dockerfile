@@ -1,4 +1,10 @@
-FROM golang:1.25.1-alpine3.22
-WORKDIR /server
+FROM golang:1.25.1-alpine3.22 AS builder
+WORKDIR /build
 COPY . .
-ENTRYPOINT [ "go", "build", "server.go" ]
+RUN go build server.go
+
+FROM golang:1.25.1-alpine3.22 AS runner
+WORKDIR /server
+COPY --from=builder /build/server .
+EXPOSE 5000
+ENTRYPOINT [ "./server" ]
